@@ -17,8 +17,7 @@
     <activity
         android:id="@+id/settingsActivity"
         android:name="com.example.android.expenses.ui.settings.SettingsActivity"
-        android:label="SettingsActivity"
-        tools:layout="@layout/settings_activity"/>
+        android:label="SettingsActivity" />
     <fragment
         android:id="@+id/addFragment"
         android:name="com.example.android.expenses.ui.add.AddFragment"

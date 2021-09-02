@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.android.expenses.R
+import com.example.android.expenses.categories
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -30,10 +31,11 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
-            val list = listOf("1", "2", "3", "4")
             val preferences: ListPreference? = findPreference("category")
-            preferences?.entries = list.toTypedArray()
-            preferences?.entryValues = list.toTypedArray()
+            preferences?.entries = categories().map {
+                it.lowercase().replaceFirstChar { char-> char.uppercase() }
+            }.toTypedArray()
+            preferences?.entryValues = categories().map { it.lowercase() }.toTypedArray()
         }
 
         override fun onCreate(savedInstanceState: Bundle?) {

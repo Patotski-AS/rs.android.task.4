@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.android.expenses.model.Payment
+import com.example.android.expenses.startPayment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -29,7 +30,7 @@ abstract class PaymentDB : RoomDatabase() {
                         PaymentDB::class.java,
                         "db_payment"
                     )
-                        .addCallback(PaymentStartDBCallback(scope)) // стартовые данные
+                        .addCallback(PaymentStartDBCallback(scope))
                         .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
@@ -47,9 +48,7 @@ abstract class PaymentDB : RoomDatabase() {
                 scope.launch {
                     val paymentDAO = database.paymentDAO()
                     paymentDAO.clear()
-                    val payments = (0..3)
-                        .map { Payment("name$it", (10..100).random().toDouble(), "category$it") }
-                        .toList()
+                    val payments = startPayment()
                     payments.forEach { paymentDAO.insert(it) }
                 }
             }

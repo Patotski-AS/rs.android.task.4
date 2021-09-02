@@ -1,6 +1,5 @@
 package com.example.android.expenses.database
 
-import androidx.annotation.WorkerThread
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import com.example.android.expenses.database.room.PaymentDAO
@@ -11,8 +10,6 @@ class PaymentRepository(private val paymentDAO: PaymentDAO) {
 
     val allPayments: Flow<List<Payment>> = paymentDAO.getAllElements()
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert( payment: Payment) {
         paymentDAO.insert(payment)

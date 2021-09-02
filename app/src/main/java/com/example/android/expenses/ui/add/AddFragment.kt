@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
 import androidx.navigation.findNavController
 import com.example.android.expenses.R
+import com.example.android.expenses.categories
 import com.example.android.expenses.database.room.PaymentDB
 import com.example.android.expenses.database.PaymentRepository
 import com.example.android.expenses.databinding.AddFragmentBinding
@@ -42,11 +43,8 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
         viewModel =
             viewModelFactory?.let { ViewModelProvider(this, it) }?.get(AddViewModel::class.java)
 
-
-        val array = listOf("Other","Food", "Clothes", "Hobby", "Auto", "Repair")
-
         val spinnerAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, array)
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories())
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         binding.spinner.adapter = spinnerAdapter

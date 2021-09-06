@@ -1,6 +1,7 @@
 package com.example.android.expenses.ui.list.adapter
 
 import android.text.format.DateFormat
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.expenses.databinding.ListItemBinding
 import com.example.android.expenses.model.Payment
@@ -24,6 +25,11 @@ class ListViewHolder(
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
     private fun initButtonsListeners(payment: Payment?) {
+        itemView.setOnLongClickListener(View.OnLongClickListener {
+            payment?.let { it1 -> listener.onNodeLongClick(it1.id) }
+            true
+        })
+
 
     }
 }

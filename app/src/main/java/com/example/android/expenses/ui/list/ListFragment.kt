@@ -85,5 +85,9 @@ class ListFragment : Fragment(), ListListener {
         viewModel?.deletePayment(payment)
     }
 
+    override fun onNodeLongClick(id: Int) {
+        view?.findNavController()?.navigate(R.id.action_listFragment_to_addFragment)
+    }
+
 }
 

@@ -1,6 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="Database management">
 
@@ -17,15 +16,16 @@
 
         <SwitchPreferenceCompat
             android:id="@+id/sort"
+            android:summaryOff="Sort ascending"
+            android:summaryOn="Sort descending"
             app:key="sort"
             app:title="Sort" />
 
         <ListPreference
             android:defaultValue="false"
-            android:dependency="sort"
             android:entries="@array/sort"
             android:entryValues="@array/sort_values"
-            android:key="list_cort"
+            android:key="list_sort"
             android:title="Sorting parameter"
             app:useSimpleSummaryProvider="true" />
 
@@ -35,11 +35,11 @@
         <SwitchPreferenceCompat
             android:id="@+id/filter"
             app:key="filter"
-            app:title="Filter"/>
+            app:title="Filter" />
 
         <ListPreference
-            android:dependency="filter"
             android:defaultValue="false"
+            android:dependency="filter"
             android:key="category"
             android:title="Category"
             app:useSimpleSummaryProvider="true" />

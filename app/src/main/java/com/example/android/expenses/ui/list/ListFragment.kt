@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.GridLayoutManager
@@ -19,11 +20,14 @@ import com.example.android.expenses.ui.list.adapter.ListListener
 import com.example.android.expenses.ui.list.adapter.SwipeCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class ListFragment : Fragment(), ListListener {
     private val applicationScope = CoroutineScope(SupervisorJob())
     private val database by lazy { PaymentDB.getInstance(requireActivity(), applicationScope) }
-    private val repository by lazy { PaymentRepository(database.paymentDAO()) }
+    private val repository by lazy { PaymentRepository(database.paymentDAO(),requireContext()) }
 
     private var _binding: ListFragmentBinding? = null
     private val binding get() = _binding!!
@@ -37,13 +41,17 @@ class ListFragment : Fragment(), ListListener {
     ): View {
         _binding = ListFragmentBinding.inflate(inflater, container, false)
         val application = requireNotNull(this).activity?.application
-        val viewModelFactory = application?.let { ListFactory(repository) }
+        val viewModelFactory =
+            application?.let { ListFactory(repository,) }
         viewModel =
             viewModelFactory?.let { ViewModelProvider(this, it) }?.get(ListViewModel::class.java)
 
-        viewModel?.payments?.observe(viewLifecycleOwner, {
-            listAdapter.submitList(it)
-        })
+
+        lifecycle.coroutineScope.launch {
+            viewModel?.payments?.collect {
+                listAdapter.submitList(it)
+            }
+        }
 
         binding.apply {
             recyclerView.adapter = listAdapter
@@ -52,8 +60,10 @@ class ListFragment : Fragment(), ListListener {
             ItemTouchHelper(object : SwipeCallback() {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     super.onSwiped(viewHolder, direction)
-                    val payment = viewModel?.payments?.value?.get(viewHolder.adapterPosition)
-                    payment?.let { deleteItem(it) }
+                    lifecycle.coroutineScope.launch {
+                        val payment = viewModel?.payments?.first()?.get(viewHolder.adapterPosition)
+                        payment?.let { deleteItem(it) }
+                    }
                 }
             }).attachToRecyclerView(recyclerView)
 
@@ -81,7 +91,7 @@ class ListFragment : Fragment(), ListListener {
         _binding = null
     }
 
-    override fun deleteItem(payment: Payment) {
+    private fun deleteItem(payment: Payment) {
         viewModel?.deletePayment(payment)
     }
 

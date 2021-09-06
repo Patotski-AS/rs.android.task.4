@@ -3,15 +3,14 @@ package com.example.android.expenses.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.android.expenses.database.*
 import java.util.*
 
 @Entity(tableName = "payments")
 data class Payment(
-    @ColumnInfo(name = "name") var name:String?,
-    @ColumnInfo(name = "cost") var cost: Double?,
-    @ColumnInfo(name = "category") var category: String?,
+    @ColumnInfo(name = PAYMENT_NAME) var name:String?,
+    @ColumnInfo(name = PAYMENT_COST) var cost: Double?,
+    @ColumnInfo(name = PAYMENT_CATEGORY) var category: String?,
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
-    @ColumnInfo(name = "date") val date: Date = Date()
+    @ColumnInfo(name = PAYMENT_DATE) val date: Date = Date()
 )
-
-//DateFormat.format("dd.MM.yyyy, HH:mm", Date()).toString()

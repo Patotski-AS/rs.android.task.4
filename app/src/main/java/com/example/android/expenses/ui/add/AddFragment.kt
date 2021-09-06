@@ -23,7 +23,7 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private val applicationScope = CoroutineScope(SupervisorJob())
     private val database by lazy { PaymentDB.getInstance(requireActivity(), applicationScope) }
-    private val repository by lazy { PaymentRepository(database.paymentDAO()) }
+    private val repository by lazy { PaymentRepository(database.paymentDAO(),requireContext()) }
     private var _binding: AddFragmentBinding? = null
     private val binding get() = _binding!!
     private var viewModel: AddViewModel? = null

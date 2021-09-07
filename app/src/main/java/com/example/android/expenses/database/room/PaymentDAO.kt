@@ -4,7 +4,6 @@ import androidx.room.*
 import com.example.android.expenses.model.Payment
 import kotlinx.coroutines.flow.Flow
 import com.example.android.expenses.database.*
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 interface PaymentDAO {
@@ -15,8 +14,11 @@ interface PaymentDAO {
     @Update
     suspend fun update(payment: Payment)
 
-    @Query("SELECT * FROM $DB_PAYMENTS WHERE id = :key")
-    suspend fun get(key: Int): Payment?
+    @Query("SELECT * FROM $DB_PAYMENTS WHERE $ID = :id")
+    suspend fun get(id: Int): Payment?
+
+    @Query("SELECT * FROM $DB_PAYMENTS WHERE $PAYMENT_CATEGORY = :category")
+    fun getFilter(category: String): Flow<List<Payment>>
 
     @Delete
     suspend fun delete(name: Payment)

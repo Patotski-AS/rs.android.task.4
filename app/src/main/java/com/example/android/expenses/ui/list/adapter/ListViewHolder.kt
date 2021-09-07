@@ -16,7 +16,7 @@ class ListViewHolder(
         binding.apply {
             textViewName.text = payment?.name
             textViewCost.text = "${(payment?.cost)?.format(2)}"
-            textViewCategory.text = payment?.category
+            textViewCategory.text = payment?.category?.replaceFirstChar { char -> char.uppercase() }
             textViewDate.text = DateFormat.format("dd.MM.yyyy, HH:mm", payment?.date).toString()
         }
         initButtonsListeners(payment)
@@ -29,7 +29,5 @@ class ListViewHolder(
             payment?.let { it1 -> listener.onNodeLongClick(it1.id) }
             true
         })
-
-
     }
 }

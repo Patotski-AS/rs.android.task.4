@@ -4,12 +4,12 @@ import com.example.android.expenses.model.Payment
 
 
 fun categories(): List<String> {
-    return listOf("other", "Food", "Clothes", "hobby", "auto", "Repair")
+    return listOf("other", "food", "clothes", "hobby", "auto", "repair")
 }
 
 fun startPayment() : List<Payment>{
-    return (0..4)
-        .map { Payment("name$it", (10..100).random().toDouble(),
+    return (0..100)
+        .map { Payment("name$it", (0..100).random().toDouble(),
             categories()[(categories().indices).random()]
         ) }
         .toList()

@@ -26,5 +26,9 @@
         <action
             android:id="@+id/action_addFragment_to_listFragment"
             app:destination="@id/listFragment" />
+        <argument
+            android:name="payment"
+            app:argType="com.example.android.expenses.model.Payment"
+            app:nullable="true" />
     </fragment>
 </navigation>

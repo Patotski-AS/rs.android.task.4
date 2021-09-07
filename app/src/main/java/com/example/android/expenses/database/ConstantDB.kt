@@ -1,7 +1,7 @@
 package com.example.android.expenses.database
 
 
-const val DB_PAYMENTS = "payments"
+const val DB_PAYMENTS_NAME = "payments"
 
 const val ID = "id"
 const val PAYMENT_NAME = "name"

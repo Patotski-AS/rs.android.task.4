@@ -34,7 +34,6 @@ class SettingsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 
@@ -44,11 +43,6 @@ class SettingsActivity : AppCompatActivity() {
                 it.lowercase().replaceFirstChar { char -> char.uppercase() }
             }.toTypedArray()
             preferences?.entryValues = categories().map { it.lowercase() }.toTypedArray()
-        }
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-
         }
     }
 }

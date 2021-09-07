@@ -1,6 +1,5 @@
 package com.example.android.expenses.ui.list
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.expenses.database.PaymentRepository

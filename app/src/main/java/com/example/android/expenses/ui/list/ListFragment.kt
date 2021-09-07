@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class ListFragment : Fragment(), ListListener {
     private val applicationScope = CoroutineScope(SupervisorJob())
     private val database by lazy { PaymentDB.getInstance(requireActivity(), applicationScope) }
-    private val repository by lazy { PaymentRepository(database.paymentDAO(),requireContext()) }
+    private val repository by lazy { PaymentRepository(database.paymentDAO(), requireContext()) }
 
     private var _binding: ListFragmentBinding? = null
     private val binding get() = _binding!!
@@ -42,15 +42,12 @@ class ListFragment : Fragment(), ListListener {
         _binding = ListFragmentBinding.inflate(inflater, container, false)
         val application = requireNotNull(this).activity?.application
         val viewModelFactory =
-            application?.let { ListFactory(repository,) }
+            application?.let { ListFactory(repository) }
         viewModel =
             viewModelFactory?.let { ViewModelProvider(this, it) }?.get(ListViewModel::class.java)
 
-
         lifecycle.coroutineScope.launch {
-            viewModel?.payments?.collect {
-                listAdapter.submitList(it)
-            }
+            viewModel?.payments?.collect { listAdapter.submitList(it) }
         }
 
         binding.apply {
@@ -68,7 +65,8 @@ class ListFragment : Fragment(), ListListener {
             }).attachToRecyclerView(recyclerView)
 
             floatingActionButton.setOnClickListener {
-                view?.findNavController()?.navigate(R.id.action_listFragment_to_addFragment)
+                view?.findNavController()
+                    ?.navigate(ListFragmentDirections.actionListFragmentToAddFragment(null))
             }
         }
 
@@ -96,7 +94,14 @@ class ListFragment : Fragment(), ListListener {
     }
 
     override fun onNodeLongClick(id: Int) {
-        view?.findNavController()?.navigate(R.id.action_listFragment_to_addFragment)
+        viewModel?.getPayment(id)
+        lifecycle.coroutineScope.launch {
+            view?.findNavController()
+                ?.navigate(
+                    ListFragmentDirections
+                        .actionListFragmentToAddFragment(viewModel?.payment?.first())
+                )
+        }
     }
 
 }

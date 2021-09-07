@@ -14,4 +14,8 @@ class AddViewModel(
         repository.insert(payment)
     }
 
+    fun updatePayment(payment: Payment) = viewModelScope.launch {
+        repository.updatePayment(payment)
+    }
+
 }

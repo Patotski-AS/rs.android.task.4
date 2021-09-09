@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.android.expenses.database.DB_VERSION
 import com.example.android.expenses.model.Payment
 import com.example.android.expenses.startPayment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Payment::class], version = 1, exportSchema = false)
+@Database(entities = [Payment::class], version = DB_VERSION, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class PaymentDB : RoomDatabase() {
     abstract fun paymentDAO(): PaymentDAO

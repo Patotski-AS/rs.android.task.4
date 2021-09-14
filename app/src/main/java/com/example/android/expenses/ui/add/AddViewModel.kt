@@ -10,11 +10,9 @@ class AddViewModel(
     private val repository: PaymentRepository,
 ) : ViewModel() {
 
-    var name: String = "no name"
-    var cost: Double? = 0.0
-    var category: String? = null
+    var payment = Payment("no name",0.0,null)
 
-    fun addPayment(payment: Payment) = viewModelScope.launch {
+    fun addPayment() = viewModelScope.launch {
         repository.insert(payment)
     }
 

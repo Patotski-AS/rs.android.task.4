@@ -8,14 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.core.widget.addTextChangedListener
+import android.widget.Toast
 import androidx.navigation.findNavController
 import com.example.android.expenses.R
 import com.example.android.expenses.categories
 import com.example.android.expenses.database.room.PaymentDB
 import com.example.android.expenses.database.PaymentRepository
 import com.example.android.expenses.databinding.AddFragmentBinding
-import com.example.android.expenses.model.Payment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
@@ -50,38 +49,53 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         binding.apply {
             if (payment != null) {
+                editTextTextPersonName.setText(payment?.name.toString())
+                editTextCosts.setText(payment?.cost.toString())
                 editTextTextPersonName.hint = payment?.name.toString()
                 editTextCosts.hint = payment?.cost.toString()
                 spinner.setSelection(categories().indexOf(categories().find { it == payment?.category }))
-            }
-            editTextTextPersonName.addTextChangedListener {
-                if (payment == null)
-                    viewModel?.name = it.toString()
-                else payment?.name = it.toString()
-            }
-
-            editTextCosts.addTextChangedListener {
-                if (payment == null)
-                    viewModel?.cost = it.toString().toDouble()
-                else payment?.cost = it.toString().toDouble()
+                viewModel?.payment?.category = payment?.category
             }
 
             button.setOnClickListener {
-                if (payment == null)
-                    viewModel?.addPayment(Payment(viewModel?.name, viewModel?.cost, viewModel?.category))
-                else viewModel?.updatePayment(payment!!)
+                var name = ""
+                var cost = ""
+                try {
+                    name = editTextTextPersonName.text.toString()
+                    cost = editTextCosts.text.toString()
+                    if (payment == null) {
+                        viewModel?.payment?.name = name
+                        viewModel?.payment?.cost = cost.toDouble()
+                        viewModel?.addPayment()
+                    } else {
+                        payment?.name = name
+                        payment?.cost = cost.toDouble()
+                        payment?.category = viewModel?.payment?.category
+                        payment?.let { viewModel?.updatePayment(it) }
+                    }
+                    view?.findNavController()?.navigate(R.id.action_addFragment_to_listFragment)
 
-                view?.findNavController()?.navigate(R.id.action_addFragment_to_listFragment)
+                } catch (e: Exception) {
+                    if (name == "" || cost == "") {
+                        Toast.makeText(requireContext(), "not all date entered", Toast.LENGTH_LONG)
+                            .show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "incorrect date entered",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
             }
+
+            return binding.root
         }
-        return binding.root
     }
 
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
         val category = parent.getItemAtPosition(pos).toString()
-        if (payment == null)
-            viewModel?.category = category
-        else payment?.category = category
+        viewModel?.payment?.category = category
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {

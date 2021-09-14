@@ -16,4 +16,7 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="editTextTextPersonName_hint">Name</string>
+    <string name="editText_costs_hint">Cost</string>
+    <string name="floatingActionButton_description">add or update payments</string>
 </resources>

@@ -36,13 +36,13 @@ class SettingsActivity : AppCompatActivity() {
 
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
             val preferences: ListPreference? = findPreference("category")
             preferences?.entries = categories().map {
                 it.lowercase().replaceFirstChar { char -> char.uppercase() }
             }.toTypedArray()
             preferences?.entryValues = categories().map { it.lowercase() }.toTypedArray()
+            preferences?.setDefaultValue("none")
         }
     }
 }

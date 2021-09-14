@@ -8,7 +8,11 @@ import kotlinx.coroutines.launch
 
 class AddViewModel(
     private val repository: PaymentRepository,
-    ) : ViewModel() {
+) : ViewModel() {
+
+    var name: String = "no name"
+    var cost: Double? = 0.0
+    var category: String? = null
 
     fun addPayment(payment: Payment) = viewModelScope.launch {
         repository.insert(payment)

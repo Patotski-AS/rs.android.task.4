@@ -16,8 +16,12 @@ class ListViewModel(
     val payments: Flow<List<Payment>>
         get() = _payments
 
-    private var _payment = flowOf<Payment>()
-    val payment: Flow<Payment>
+    private var _cursorPayments = flowOf<List<Payment>>()
+    val cursorPayments: Flow<List<Payment>>
+        get() = _cursorPayments
+
+    private var _payment = flowOf<Payment?>()
+    val payment: Flow<Payment?>
         get() = _payment
 
     fun getPayment(id: Int) {
@@ -25,12 +29,23 @@ class ListViewModel(
             _payment = getPaymentForDB(id)
         }
     }
-    private fun getPaymentForDB(id: Int): Flow<Payment> {
+
+    fun updateCursorPayments() {
+        getCursorPayments()
+    }
+
+    private fun getCursorPayments() {
+        viewModelScope.launch {
+            _cursorPayments = repository.allPayments()
+        }
+
+    }
+
+    private fun getPaymentForDB(id: Int): Flow<Payment?> {
         return repository.getPaymentForDB(id)
     }
 
     fun deletePayment(payment: Payment) = viewModelScope.launch {
         repository.deletePayment(payment)
     }
-
 }

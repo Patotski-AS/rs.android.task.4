@@ -2,17 +2,22 @@ package com.example.android.expenses.ui.list
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.expenses.R
+import com.example.android.expenses.database.CURSOR
 import com.example.android.expenses.database.room.PaymentDB
 import com.example.android.expenses.database.PaymentRepository
+import com.example.android.expenses.database.ROOM
 import com.example.android.expenses.databinding.ListFragmentBinding
 import com.example.android.expenses.model.Payment
 import com.example.android.expenses.ui.list.adapter.ListAdapter
@@ -27,7 +32,6 @@ import kotlinx.coroutines.launch
 class ListFragment : Fragment(), ListListener {
     private val applicationScope = CoroutineScope(SupervisorJob())
     private val database by lazy { PaymentDB.getInstance(requireActivity(), applicationScope) }
-    private val repository by lazy { PaymentRepository(database.paymentDAO(), requireContext()) }
 
     private var _binding: ListFragmentBinding? = null
     private val binding get() = _binding!!
@@ -35,19 +39,41 @@ class ListFragment : Fragment(), ListListener {
     private var viewModel: ListViewModel? = null
     private val listAdapter = ListAdapter(this)
 
+    private lateinit var management: String
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = ListFragmentBinding.inflate(inflater, container, false)
         val application = requireNotNull(this).activity?.application
+        val repository = application?.let { PaymentRepository(database.paymentDAO(), it) }
         val viewModelFactory =
-            application?.let { ListFactory(repository) }
+            application?.let { repository?.let { repository -> ListFactory(repository) } }
         viewModel =
             viewModelFactory?.let { ViewModelProvider(this, it) }?.get(ListViewModel::class.java)
 
-        lifecycle.coroutineScope.launch {
-            viewModel?.payments?.collect { listAdapter.submitList(it) }
+        val preferences = PreferenceManager.getDefaultSharedPreferences(application)
+        management = preferences.getString("list_management", ROOM).toString().trim()
+
+
+        if (management == ROOM) {
+            lifecycle.coroutineScope.launch {
+                viewModel?.payments?.collect {
+                    Log.i("MyLog", "payments?.collect ")
+                    listAdapter.submitList(it)
+                }
+            }
+        } else {
+            viewModel?.updateCursorPayments()
+            lifecycle.coroutineScope.launch {
+                viewModel?.cursorPayments?.collect {
+                    Log.i("MyLog", "cursorPayments?.collect ")
+                    listAdapter.submitList(it)
+                }
+                viewModel?.updateCursorPayments()
+
+            }
         }
 
         binding.apply {
@@ -58,8 +84,14 @@ class ListFragment : Fragment(), ListListener {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     super.onSwiped(viewHolder, direction)
                     lifecycle.coroutineScope.launch {
-                        val payment = viewModel?.payments?.first()?.get(viewHolder.adapterPosition)
-                        payment?.let { deleteItem(it) }
+                        val payment =
+                            viewModel?.payments?.first()?.get(viewHolder.adapterPosition)
+                        payment?.let {
+                            deleteItem(it)
+                            if (management == CURSOR) {
+                                viewModel?.updateCursorPayments()
+                            }
+                        }
                     }
                 }
             }).attachToRecyclerView(recyclerView)
@@ -91,6 +123,15 @@ class ListFragment : Fragment(), ListListener {
 
     private fun deleteItem(payment: Payment) {
         viewModel?.deletePayment(payment)
+        if (management == CURSOR) {
+            viewModel?.updateCursorPayments()
+            lifecycle.coroutineScope.launch {
+                viewModel?.cursorPayments?.collect {
+                    listAdapter.submitList(it.toList())
+                    Log.i("MyLog", "payments?.collect.delete ")
+                }
+            }
+        }
     }
 
     override fun onNodeLongClick(id: Int) {

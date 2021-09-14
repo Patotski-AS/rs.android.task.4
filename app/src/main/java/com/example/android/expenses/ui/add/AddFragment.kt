@@ -23,14 +23,9 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private val applicationScope = CoroutineScope(SupervisorJob())
     private val database by lazy { PaymentDB.getInstance(requireActivity(), applicationScope) }
-    private val repository by lazy { PaymentRepository(database.paymentDAO(), requireContext()) }
     private var _binding: AddFragmentBinding? = null
     private val binding get() = _binding!!
     private var viewModel: AddViewModel? = null
-
-    private var name: String? = "no name"
-    private var cost: Double? = 0.0
-    private var category: String? = null
 
     private val payment by lazy { AddFragmentArgs.fromBundle(requireArguments()).payment }
 
@@ -41,7 +36,9 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
         _binding = AddFragmentBinding.inflate(inflater, container, false)
 
         val application = requireNotNull(this).activity?.application
-        val viewModelFactory = application?.let { AddFactory(repository) }
+        val repository = application?.let { PaymentRepository(database.paymentDAO(), it) }
+
+        val viewModelFactory = application?.let { repository?.let { it1 -> AddFactory(it1) } }
         viewModel =
             viewModelFactory?.let { ViewModelProvider(this, it) }?.get(AddViewModel::class.java)
         val spinnerAdapter =
@@ -59,19 +56,19 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
             }
             editTextTextPersonName.addTextChangedListener {
                 if (payment == null)
-                    name = it.toString()
+                    viewModel?.name = it.toString()
                 else payment?.name = it.toString()
             }
 
             editTextCosts.addTextChangedListener {
                 if (payment == null)
-                    cost = it.toString().toDouble()
+                    viewModel?.cost = it.toString().toDouble()
                 else payment?.cost = it.toString().toDouble()
             }
 
             button.setOnClickListener {
                 if (payment == null)
-                    viewModel?.addPayment(Payment(name, cost, category))
+                    viewModel?.addPayment(Payment(viewModel?.name, viewModel?.cost, viewModel?.category))
                 else viewModel?.updatePayment(payment!!)
 
                 view?.findNavController()?.navigate(R.id.action_addFragment_to_listFragment)
@@ -83,7 +80,7 @@ class AddFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
         val category = parent.getItemAtPosition(pos).toString()
         if (payment == null)
-            this.category = category
+            viewModel?.category = category
         else payment?.category = category
     }
 

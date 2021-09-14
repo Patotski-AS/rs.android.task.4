@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.android.expenses.database.DB_PAYMENTS_NAME
 import com.example.android.expenses.database.DB_VERSION
 import com.example.android.expenses.model.Payment
 import com.example.android.expenses.startPayment
@@ -29,7 +30,7 @@ abstract class PaymentDB : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         PaymentDB::class.java,
-                        "db_payment"
+                        DB_PAYMENTS_NAME
                     )
                         .addCallback(PaymentStartDBCallback(scope))
                         .fallbackToDestructiveMigration()

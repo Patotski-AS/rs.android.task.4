@@ -27,7 +27,8 @@
             android:entryValues="@array/sort_values"
             android:key="list_sort"
             android:title="Sorting parameter"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="none"/>
 
     </PreferenceCategory>
     <PreferenceCategory app:title="Filtration">
@@ -42,7 +43,8 @@
             android:dependency="filter"
             android:key="category"
             android:title="Category"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="none"
+            app:useSimpleSummaryProvider="true"/>
 
     </PreferenceCategory>
 

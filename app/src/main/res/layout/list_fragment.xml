@@ -17,7 +17,8 @@
         android:src="@drawable/ic_baseline_add_shopping_cart_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="TODO" />
+        android:contentDescription="@string/floatingActionButton_description"
+        android:focusable="true" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

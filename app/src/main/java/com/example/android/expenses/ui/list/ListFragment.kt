@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.activity.addCallback
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -56,6 +58,17 @@ class ListFragment : Fragment(), ListListener {
         val preferences = PreferenceManager.getDefaultSharedPreferences(application)
         management = preferences.getString("list_management", ROOM).toString().trim()
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            AlertDialog.Builder(requireContext(), R.style.AlertDialog).apply {
+                setTitle("Quit the application?")
+                setPositiveButton("Yes") { _, _ ->
+                    ActivityCompat.finishAffinity(requireActivity())
+                }
+                setNegativeButton("No") { _, _ ->
+                }
+                setCancelable(true)
+            }.create().show()
+        }
 
         if (management == ROOM) {
             lifecycle.coroutineScope.launch {

@@ -92,7 +92,7 @@ class PaymentRepository(
                             "$PAYMENT_NAME = '${payment.name}', " +
                             "$PAYMENT_COST = '${payment.cost}', " +
                             "$PAYMENT_CATEGORY = '${payment.category}', " +
-                            "$PAYMENT_DATE = '${payment.date}' " +
+                            "$PAYMENT_DATE = '${payment.date.time}' " +
                             "WHERE $ID = '${payment.id}'"
                 )
             } catch (e: Exception) {
@@ -106,19 +106,19 @@ class PaymentRepository(
     private fun sortListPayments(list: List<Payment>): List<Payment> {
         return if (asSort) {
             when (sort) {
-                PAYMENT_NAME -> list.sortedBy { it.name }
-                PAYMENT_COST -> list.sortedBy { it.cost }
-                PAYMENT_CATEGORY -> list.sortedBy { it.category }
-                PAYMENT_DATE -> list.sortedBy { it.date }
-                else -> list.sortedBy { it.id }
-            }
-        } else {
-            when (sort) {
                 PAYMENT_NAME -> list.sortedByDescending { it.name }
                 PAYMENT_COST -> list.sortedByDescending { it.cost }
                 PAYMENT_CATEGORY -> list.sortedByDescending { it.category }
                 PAYMENT_DATE -> list.sortedByDescending { it.date }
                 else -> list.sortedByDescending { it.id }
+            }
+        } else {
+            when (sort) {
+                PAYMENT_NAME -> list.sortedBy { it.name }
+                PAYMENT_COST -> list.sortedBy { it.cost }
+                PAYMENT_CATEGORY -> list.sortedBy { it.category }
+                PAYMENT_DATE -> list.sortedBy { it.date }
+                else -> list.sortedBy { it.id }
             }
         }
     }

@@ -8,7 +8,7 @@ fun categories(): List<String> {
 }
 
 fun startPayment() : List<Payment>{
-    return (0..5)
+    return (0..50)
         .map { Payment("name$it", (0..100).random().toDouble(),
             categories()[(categories().indices).random()]
         ) }

@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.android.expenses.database.DB_PAYMENTS_NAME
-import com.example.android.expenses.database.DB_VERSION
+import com.example.android.expenses.DB_PAYMENTS_NAME
+import com.example.android.expenses.DB_VERSION
 import com.example.android.expenses.model.Payment
 import com.example.android.expenses.startPayment
 import kotlinx.coroutines.CoroutineScope

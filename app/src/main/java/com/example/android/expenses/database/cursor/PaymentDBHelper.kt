@@ -4,12 +4,13 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.example.android.expenses.database.*
+import com.example.android.expenses.*
 import com.example.android.expenses.model.Payment
 import java.util.*
 
 
 class PaymentDBHelper(context: Context?) :
+
     SQLiteOpenHelper(context, DB_PAYMENTS_NAME, null, DB_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {

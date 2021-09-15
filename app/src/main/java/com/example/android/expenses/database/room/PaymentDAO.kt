@@ -1,9 +1,10 @@
 package com.example.android.expenses.database.room
 
 import androidx.room.*
+import com.example.android.expenses.DB_PAYMENTS_NAME
+import com.example.android.expenses.PAYMENT_CATEGORY
 import com.example.android.expenses.model.Payment
 import kotlinx.coroutines.flow.Flow
-import com.example.android.expenses.database.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
@@ -19,7 +20,6 @@ interface PaymentDAO {
     fun getPaymentForDB(id: Int): Flow<Payment>
     fun getDogDistinctUntilChanged(id: Int) =
         getPaymentForDB(id).distinctUntilChanged()
-
 
     @Query("SELECT * FROM $DB_PAYMENTS_NAME WHERE $PAYMENT_CATEGORY = :category")
     fun getFilter(category: String): Flow<List<Payment>>

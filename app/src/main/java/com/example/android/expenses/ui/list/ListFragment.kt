@@ -2,7 +2,6 @@ package com.example.android.expenses.ui.list
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
@@ -13,18 +12,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.example.android.expenses.R
-import com.example.android.expenses.database.CURSOR
+import com.example.android.expenses.CURSOR
+import com.example.android.expenses.PREF_LIST_MANAGEMENT
 import com.example.android.expenses.database.room.PaymentDB
 import com.example.android.expenses.database.PaymentRepository
-import com.example.android.expenses.database.ROOM
+import com.example.android.expenses.ROOM
 import com.example.android.expenses.databinding.ListFragmentBinding
 import com.example.android.expenses.model.Payment
 import com.example.android.expenses.ui.list.adapter.ListAdapter
 import com.example.android.expenses.ui.list.adapter.ListListener
-import com.example.android.expenses.ui.list.adapter.SwipeCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collect
@@ -56,40 +53,9 @@ class ListFragment : Fragment(), ListListener {
             viewModelFactory?.let { ViewModelProvider(this, it) }?.get(ListViewModel::class.java)
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(application)
-        management = preferences.getString("list_management", ROOM).toString().trim()
+        management = preferences.getString(PREF_LIST_MANAGEMENT, ROOM).toString().trim()
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            AlertDialog.Builder(requireContext(), R.style.AlertDialog).apply {
-                setTitle("Quit the application?")
-                setPositiveButton("Yes") { _, _ ->
-                    ActivityCompat.finishAffinity(requireActivity())
-                }
-                setNegativeButton("No") { _, _ ->
-                }
-                setCancelable(true)
-            }.create().show()
-        }
-
-        if (management == ROOM) {
-            lifecycle.coroutineScope.launch {
-                viewModel?.payments?.collect {
-                    Log.i("MyLog", "payments?.collect ")
-                    listAdapter.submitList(it)
-                }
-            }
-        } else {
-            viewModel?.updateCursorPayments()
-            lifecycle.coroutineScope.launch {
-                viewModel?.cursorPayments?.collect {
-                    Log.i("MyLog", "cursorPayments?.collect ")
-                    listAdapter.submitList(it)
-                }
-                viewModel?.updateCursorPayments()
-
-            }
-        }
-
-
+        update()
 
         binding.apply {
             recyclerView.adapter = listAdapter
@@ -110,6 +76,18 @@ class ListFragment : Fragment(), ListListener {
                 view?.findNavController()
                     ?.navigate(ListFragmentDirections.actionListFragmentToAddFragment(null))
             }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            AlertDialog.Builder(requireContext(), R.style.AlertDialog).apply {
+                setTitle("Quit the application?")
+                setPositiveButton("Yes") { _, _ ->
+                    ActivityCompat.finishAffinity(requireActivity())
+                }
+                setNegativeButton("No") { _, _ ->
+                }
+                setCancelable(true)
+            }.create().show()
         }
 
         setHasOptionsMenu(true)
@@ -138,7 +116,6 @@ class ListFragment : Fragment(), ListListener {
             lifecycle.coroutineScope.launch {
                 viewModel?.cursorPayments?.collect {
                     listAdapter.submitList(it.toList())
-                    Log.i("MyLog", "payments?.collect.delete $payment ")
                 }
             }
         }
@@ -155,5 +132,22 @@ class ListFragment : Fragment(), ListListener {
         }
     }
 
+    private fun update(){
+        if (management == ROOM) {
+            lifecycle.coroutineScope.launch {
+                viewModel?.payments?.collect {
+                    listAdapter.submitList(it)
+                }
+            }
+        } else {
+            viewModel?.updateCursorPayments()
+            lifecycle.coroutineScope.launch {
+                viewModel?.cursorPayments?.collect {
+                    listAdapter.submitList(it)
+                }
+                viewModel?.updateCursorPayments()
+            }
+        }
+    }
 }
 

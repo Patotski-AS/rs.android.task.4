@@ -1,7 +1,6 @@
 package com.example.android.expenses.ui.list.adapter
 
 import android.text.format.DateFormat
-import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.expenses.databinding.ListItemBinding
 import com.example.android.expenses.model.Payment
@@ -28,12 +27,11 @@ class ListViewHolder(
 
         binding.imageViewDel.setOnClickListener {
             payment?.let { it1 -> listener.deleteItem(it1) }
-
         }
 
-        itemView.setOnLongClickListener(View.OnLongClickListener {
+        itemView.setOnLongClickListener {
             payment?.let { it1 -> listener.onNodeLongClick(it1.id) }
             true
-        })
+        }
     }
 }

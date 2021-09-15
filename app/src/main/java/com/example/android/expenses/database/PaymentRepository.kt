@@ -1,31 +1,28 @@
 package com.example.android.expenses.database
 
 import android.app.Application
-import android.content.ContentValues
-import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import com.example.android.expenses.database.cursor.PaymentDBHelper
+import com.example.android.expenses.*
+import com.example.android.expenses.database.cursor.CursorHelper
 import com.example.android.expenses.database.room.PaymentDAO
 import com.example.android.expenses.model.Payment
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class PaymentRepository(
     private val paymentDAO: PaymentDAO,
     private val application: Application,
-    private val dbHelper: PaymentDBHelper = PaymentDBHelper(application)
+    private val cursorHelper: CursorHelper = CursorHelper(application)
 ) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
-    private val management = preferences.getString("list_management", ROOM).toString().trim()
-    private val asSort = preferences.getBoolean("sort", false)
-    private val sort = preferences.getString("list_sort", ID).toString().trim()
-    private val filter = preferences.getString("category", NONE).toString().trim()
-    private val asFilter = preferences.getBoolean("filter", false)
+    private val management = preferences.getString(PREF_LIST_MANAGEMENT, ROOM).toString().trim()
+    private val asSort = preferences.getBoolean(PREF_SORT, false)
+    private val sort = preferences.getString(PREF_LIST_SORT, ID).toString().trim()
+    private val filter = preferences.getString(PREF_CATEGORY, NONE).toString().trim()
+    private val asFilter = preferences.getBoolean(PREF_FILTER, false)
 
     fun allPayments(): Flow<List<Payment>> {
         return if (management == ROOM) {
@@ -35,9 +32,9 @@ class PaymentRepository(
                 paymentDAO.getAllElements().map { sortListPayments(it) }
         } else {
             if (asFilter) {
-                flowOf(sortListPayments(dbHelper.getPaymentsList(filter)))
+                cursorHelper.getPaymentsList(filter).map { sortListPayments(it) }
             } else
-                flowOf(sortListPayments(dbHelper.getPaymentsList(null)))
+                cursorHelper.getPaymentsList(null).map { sortListPayments(it) }
         }
     }
 
@@ -46,67 +43,28 @@ class PaymentRepository(
         if (management == ROOM)
             paymentDAO.insert(payment)
         else {
-            val contentValues = ContentValues()
-            contentValues.put(PAYMENT_NAME, payment.name)
-            contentValues.put(PAYMENT_COST, payment.cost)
-            contentValues.put(PAYMENT_CATEGORY, payment.category)
-            contentValues.put(PAYMENT_DATE, payment.date.time)
-            dbHelper.readableDatabase.insert(DB_PAYMENTS_NAME, null, contentValues)
+            cursorHelper.insert(payment)
         }
     }
 
     fun getPaymentForDB(id: Int): Flow<Payment?> {
         return if (management == ROOM)
             paymentDAO.getDogDistinctUntilChanged(id)
-        else flowOf(dbHelper.getPayment(id))
+        else cursorHelper.getPayment(id)
     }
 
     suspend fun deletePayment(payment: Payment) {
-        Log.i("MyLog","deletePayment db.execSQL ${payment.toString()}")
-
         if (management == ROOM)
             paymentDAO.delete(payment)
-        else {
-            val db: SQLiteDatabase = application.applicationContext.openOrCreateDatabase(
-                DB_PAYMENTS_NAME, Context.MODE_PRIVATE, null
-            )
-            try {
-             val delete =   db.delete(DB_PAYMENTS_NAME,"$ID = ${payment.id}",null)
-                Log.i("MyLog","deletePayment db.execSQL ${payment.toString()}")
-
-//                db.execSQL("DELETE FROM $DB_PAYMENTS_NAME WHERE $ID = '${payment.id}'")
-            } catch (e: Exception) {
-
-            } finally {
-                db.close()
-            }
-        }
+        else
+            cursorHelper.delete(payment)
     }
 
     suspend fun updatePayment(payment: Payment) {
         if (management == ROOM)
             paymentDAO.update(payment)
-        else {
-            val db: SQLiteDatabase = application.applicationContext.openOrCreateDatabase(
-                DB_PAYMENTS_NAME,
-                Context.MODE_PRIVATE,
-                null
-            )
-            try {
-                db.execSQL(
-                    "UPDATE $DB_PAYMENTS_NAME SET " +
-                            "$PAYMENT_NAME = '${payment.name}', " +
-                            "$PAYMENT_COST = '${payment.cost}', " +
-                            "$PAYMENT_CATEGORY = '${payment.category}', " +
-                            "$PAYMENT_DATE = '${payment.date.time}' " +
-                            "WHERE $ID = '${payment.id}'"
-                )
-            } catch (e: Exception) {
-
-            } finally {
-                db.close()
-            }
-        }
+        else
+            cursorHelper.update(payment)
     }
 
     private fun sortListPayments(list: List<Payment>): List<Payment> {

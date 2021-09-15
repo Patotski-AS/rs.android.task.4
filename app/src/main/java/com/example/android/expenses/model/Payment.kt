@@ -5,9 +5,9 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.android.expenses.database.*
+import com.example.android.expenses.*
 import java.util.*
-@Entity(tableName = "payments")
+@Entity(tableName = DB_PAYMENTS_NAME)
 data class Payment (
     @ColumnInfo(name = PAYMENT_NAME) var name:String?,
     @ColumnInfo(name = PAYMENT_COST) var cost: Double?,

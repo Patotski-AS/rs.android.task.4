@@ -89,25 +89,22 @@ class ListFragment : Fragment(), ListListener {
             }
         }
 
+
+
         binding.apply {
             recyclerView.adapter = listAdapter
             recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
 
-            ItemTouchHelper(object : SwipeCallback() {
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    super.onSwiped(viewHolder, direction)
-                    lifecycle.coroutineScope.launch {
-                        val payment =
-                            viewModel?.payments?.first()?.get(viewHolder.adapterPosition)
-                        payment?.let {
-                            deleteItem(it)
-                            if (management == CURSOR) {
-                                viewModel?.updateCursorPayments()
-                            }
-                        }
-                    }
-                }
-            }).attachToRecyclerView(recyclerView)
+//            ItemTouchHelper(object : SwipeCallback() {
+//                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//                    Log.i("MyLog", "viewHolder = ${viewHolder.adapterPosition}, direction = $direction  ")
+//                    super.onSwiped(viewHolder, direction)
+//                    deleteItem(viewHolder.layoutPosition)
+//                    if (management == CURSOR) {
+//                        viewModel?.updateCursorPayments()
+//                    }
+//                }
+//            }).attachToRecyclerView(recyclerView)
 
             floatingActionButton.setOnClickListener {
                 view?.findNavController()
@@ -134,14 +131,14 @@ class ListFragment : Fragment(), ListListener {
         _binding = null
     }
 
-    private fun deleteItem(payment: Payment) {
+    override fun deleteItem(payment: Payment) {
         viewModel?.deletePayment(payment)
         if (management == CURSOR) {
             viewModel?.updateCursorPayments()
             lifecycle.coroutineScope.launch {
                 viewModel?.cursorPayments?.collect {
                     listAdapter.submitList(it.toList())
-                    Log.i("MyLog", "payments?.collect.delete ")
+                    Log.i("MyLog", "payments?.collect.delete $payment ")
                 }
             }
         }

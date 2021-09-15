@@ -3,6 +3,7 @@ package com.example.android.expenses.ui.list
 import androidx.lifecycle.*
 import com.example.android.expenses.database.PaymentRepository
 import com.example.android.expenses.model.Payment
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow as Flow
@@ -38,7 +39,6 @@ class ListViewModel(
         viewModelScope.launch {
             _cursorPayments = repository.allPayments()
         }
-
     }
 
     private fun getPaymentForDB(id: Int): Flow<Payment?> {

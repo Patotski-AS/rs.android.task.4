@@ -25,6 +25,12 @@ class ListViewHolder(
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
     private fun initButtonsListeners(payment: Payment?) {
+
+        binding.imageViewDel.setOnClickListener {
+            payment?.let { it1 -> listener.deleteItem(it1) }
+
+        }
+
         itemView.setOnLongClickListener(View.OnLongClickListener {
             payment?.let { it1 -> listener.onNodeLongClick(it1.id) }
             true

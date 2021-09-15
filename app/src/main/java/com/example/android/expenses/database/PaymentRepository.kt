@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -61,6 +62,8 @@ class PaymentRepository(
     }
 
     suspend fun deletePayment(payment: Payment) {
+        Log.i("MyLog","deletePayment db.execSQL ${payment.toString()}")
+
         if (management == ROOM)
             paymentDAO.delete(payment)
         else {
@@ -68,7 +71,10 @@ class PaymentRepository(
                 DB_PAYMENTS_NAME, Context.MODE_PRIVATE, null
             )
             try {
-                db.execSQL("DELETE FROM $DB_PAYMENTS_NAME WHERE $ID = '${payment.id}'")
+             val delete =   db.delete(DB_PAYMENTS_NAME,"$ID = ${payment.id}",null)
+                Log.i("MyLog","deletePayment db.execSQL ${payment.toString()}")
+
+//                db.execSQL("DELETE FROM $DB_PAYMENTS_NAME WHERE $ID = '${payment.id}'")
             } catch (e: Exception) {
 
             } finally {
